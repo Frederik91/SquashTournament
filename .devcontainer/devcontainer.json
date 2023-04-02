@@ -27,10 +27,14 @@
 	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
+	"remoteUser": "node",
+	"mounts": [
+		"source=${localWorkspaceFolderBasename}-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+	],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
-	"postCreateCommand": "cd client && npm install"
+	"postCreateCommand": "sudo chown node node_modules && cd client && npm install"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
