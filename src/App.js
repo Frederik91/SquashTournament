@@ -1,5 +1,5 @@
 import './App.css';
-import SignInPage from './SignInPage';
+import SignInPage from './Pages/SignInPage';
 
 function App() {
   return (
