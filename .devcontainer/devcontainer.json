@@ -6,15 +6,31 @@
 	//"image": "mcr.microsoft.com/devcontainers/typescript-node:0-18"
 	"build": {
 		"dockerfile": "Dockerfile"
-	}
+	},
+
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"GitHub.copilotvs",
+				"ms-azuretools.vscode-docker",
+				"GitHub.copilot-labs"
+			]
+		}
+	},
 	// Features to add to the dev container. More info: https://containers.dev/features.
 	// "features": {},
-
+	"features": {
+		"ghcr.io/devcontainers/features/dotnet:1": {
+			"installUsingApt": true,
+			"version": "latest"
+		}
+	},
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
+	"postCreateCommand": "cd client && npm install"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
