@@ -13,13 +13,15 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import backgroundImage from './../assets/images/signin-background.jpg'
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
       {'Copyright © '}
       <Link color="inherit" href="https://mui.com/">
-        Your Website
+        SquashTournament
       </Link>{' '}
       {new Date().getFullYear()}
       {'.'}
@@ -29,7 +31,11 @@ function Copyright(props) {
 
 const theme = createTheme();
 
+
+
 export default function SignInPage() {
+  const navigate = useNavigate();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -37,14 +43,17 @@ export default function SignInPage() {
       email: data.get('email'),
       password: data.get('password'),
     });
+    navigate('/home');   
   };
+
+  const { t } = useTranslation();
 
   return (
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
         <Grid
-          item          
+          item
           xs={false}
           sm={4}
           md={7}
@@ -71,7 +80,7 @@ export default function SignInPage() {
               <LockOutlinedIcon />
             </Avatar>
             <Typography component="h1" variant="h5">
-              Sign in
+              {t("Sign in")}
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
@@ -79,7 +88,7 @@ export default function SignInPage() {
                 required
                 fullWidth
                 id="email"
-                label="Email Address"
+                label={t("Email Address")}
                 name="email"
                 autoComplete="email"
                 autoFocus
@@ -89,14 +98,14 @@ export default function SignInPage() {
                 required
                 fullWidth
                 name="password"
-                label="Password"
+                label={t("Password")}
                 type="password"
                 id="password"
                 autoComplete="current-password"
               />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
+                label={t("Remember me")}
               />
               <Button
                 type="submit"
@@ -104,17 +113,17 @@ export default function SignInPage() {
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
               >
-                Sign In
+                {t("Sign in")}
               </Button>
               <Grid container>
                 <Grid item xs>
                   <Link href="#" variant="body2">
-                    Forgot password?
+                  {t("Forgot password?")}
                   </Link>
                 </Grid>
                 <Grid item>
                   <Link href="#" variant="body2">
-                    {"Don't have an account? Sign Up"}
+                    {t("Don't have an account? Sign Up")}
                   </Link>
                 </Grid>
               </Grid>
