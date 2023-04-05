@@ -10,7 +10,7 @@ public static class TournamentEndpoints
 
     public static WebApplication AddTournamentEndpoints(this WebApplication app)
     {
-        app.MapGet("/tournaments", async (HttpContext context, ApplicationDbContext dbContext) =>
+        app.MapGet("api/tournaments", async (HttpContext context, ApplicationDbContext dbContext) =>
         {
             var tournaments = await dbContext.Tournaments.ToListAsync();
             await context.Response.WriteAsJsonAsync(tournaments);
@@ -19,7 +19,7 @@ public static class TournamentEndpoints
         .WithDescription("Get all tournaments")
         .WithOpenApi();
 
-        app.MapPost("/tournaments", async (HttpContext context, ApplicationDbContext dbContext, CreateTournamentRequest request) =>
+        app.MapPost("api/tournaments", async (HttpContext context, ApplicationDbContext dbContext, CreateTournamentRequest request) =>
         {
             var tournament = new TournamentTbl
             {

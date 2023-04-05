@@ -17,6 +17,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors();
 
 var app = builder.Build();
 
@@ -43,6 +44,13 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+
+  app.UseCors(options =>
+    {
+        options.WithOrigins("http://localhost:3000");
+        options.AllowAnyMethod();
+        options.AllowAnyHeader();
+    });
 
 app.UseAuthorization();
 
