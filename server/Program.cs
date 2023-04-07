@@ -3,6 +3,11 @@ using Microsoft.EntityFrameworkCore;
 using SquashTournament.Server.Data;
 using Microsoft.OpenApi.Models;
 using SquashTournament.Server.Endpoints;
+using SquashTournament.Server.Requirements;
+using Microsoft.AspNetCore.Authorization;
+using SquashTournament.Server.Authorization;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,9 +20,38 @@ builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
+builder.Services.Configure<AuthAppSettings>(builder.Configuration.GetSection("AuthAppSettings"));
+
+builder.Services.AddAuthentication().AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = options.Configuration.Issue["Jwt:Issuer"],
+            ValidAudience = Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+        };
+    });
+
+builder.Services.AddAuthorization(o =>
+{
+    o.AddPolicy("ADMIN", p => p.AddRequirements(new AdminRoleRequirement("AMIN")));
+});
+
+builder.Services.AddScoped<IJwtUtils, JwtUtils>();
+
+builder.Services.AddSingleton<IAuthorizationHandler, AdminRoleRequirementHandler>();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddCors();
+
+builder.Services.AddLogging(builde =>
+{
+    builde.AddConsole();
+});
 
 var app = builder.Build();
 
@@ -45,14 +79,38 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-  app.UseCors(options =>
-    {
-        options.WithOrigins("http://localhost:3000");
-        options.AllowAnyMethod();
-        options.AllowAnyHeader();
-    });
+app.UseMiddleware<JwtMiddleware>();
+
+app.UseCors(options =>
+  {
+      options.WithOrigins("http://localhost:3000");
+      options.AllowAnyMethod();
+      options.AllowAnyHeader();
+  });
 
 app.UseAuthorization();
+app.usejw
+
+if (app.Environment.IsDevelopment())
+{
+    app.Use(async (context, next) =>
+    {
+        // log request details
+        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
+        logger.LogInformation($"Request {context.Request.Method} {context.Request.Path}");
+
+        await next.Invoke();
+
+        // log response details
+        logger.LogInformation($"Response {context.Response.StatusCode}");
+        if (context.Response.Body is not null && context.Response.Body.CanRead)
+        {
+            using var reader = new StreamReader(context.Response.Body);
+            var body = new StreamReader(context.Response.Body).ReadToEnd();
+            logger.LogInformation($"Response body: {body}");
+        }
+    });
+}
 
 app.AddAuthenticationEndpoints();
 app.AddTournamentEndpoints();

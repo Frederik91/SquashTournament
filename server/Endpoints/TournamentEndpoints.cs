@@ -17,7 +17,8 @@ public static class TournamentEndpoints
         })
         .WithName("GetTournaments")
         .WithDescription("Get all tournaments")
-        .WithOpenApi();
+        .WithOpenApi()
+        .RequireAuthorization();
 
         app.MapPost("api/tournaments", async (HttpContext context, ApplicationDbContext dbContext, CreateTournamentRequest request) =>
         {

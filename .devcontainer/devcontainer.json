@@ -34,7 +34,7 @@
 
 	// Use 'postCreateCommand' to run commands after the container is created.
 	// "postCreateCommand": "yarn install",
-	"postCreateCommand": "sudo chown node node_modules && cd client && npm install"
+	"postCreateCommand": "sudo chown node node_modules && cd client && npm install && dotnet tool install --global dotnet-ef"
 
 	// Configure tool-specific properties.
 	// "customizations": {},
