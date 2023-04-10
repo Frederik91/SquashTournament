@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using SquashTournament.Server.Authorization;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,12 +18,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite(connectionString));
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
-builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
+builder.Services.AddDefaultIdentity<IdentityUser>()
     .AddEntityFrameworkStores<ApplicationDbContext>();
 
-builder.Services.Configure<AuthAppSettings>(builder.Configuration.GetSection("AuthAppSettings"));
+builder.Services.Configure<AuthAppSettings>(builder.Configuration.GetSection("Jwt"));
 
-builder.Services.AddAuthentication().AddJwtBearer(options =>
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
     {
         options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -30,15 +31,15 @@ builder.Services.AddAuthentication().AddJwtBearer(options =>
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = options.Configuration.Issue["Jwt:Issuer"],
-            ValidAudience = Configuration["Jwt:Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
         };
     });
 
 builder.Services.AddAuthorization(o =>
 {
-    o.AddPolicy("ADMIN", p => p.AddRequirements(new AdminRoleRequirement("AMIN")));
+    o.AddPolicy("ADMIN", p => p.AddRequirements(new AdminRoleRequirement("ADMIN")));
 });
 
 builder.Services.AddScoped<IJwtUtils, JwtUtils>();
@@ -79,7 +80,6 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
-app.UseMiddleware<JwtMiddleware>();
 
 app.UseCors(options =>
   {
@@ -88,8 +88,8 @@ app.UseCors(options =>
       options.AllowAnyHeader();
   });
 
+app.UseAuthentication();
 app.UseAuthorization();
-app.usejw
 
 if (app.Environment.IsDevelopment())
 {
